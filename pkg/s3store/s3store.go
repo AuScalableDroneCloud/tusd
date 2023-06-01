@@ -640,9 +640,21 @@ func (upload s3Upload) FinishUpload(ctx context.Context) error {
 	uploadId, multipartId := splitIds(id)
 
 	// Get uploaded parts
-	parts, err := store.listAllParts(ctx, id)
-	if err != nil {
-		return err
+	// OK 1/6/23 - do this in a loop until error or
+	// there are more than zero parts, if still zero after timeout
+	// process the problematic block below which causes our 0-byte upload bug
+	for number < 10 {
+		parts, err := store.listAllParts(ctx, id)
+		if err != nil {
+			return err
+		}
+
+		if len(parts) > 0 {
+			break
+		}
+
+		//Sleep for 250ms before retrying
+		time.Sleep(250 * time.Millisecond)
 	}
 
 	if len(parts) == 0 {
