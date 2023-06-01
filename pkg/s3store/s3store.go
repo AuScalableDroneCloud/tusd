@@ -657,7 +657,7 @@ func (upload s3Upload) FinishUpload(ctx context.Context) error {
 		//Sleep for 250ms before retrying
 		time.Sleep(250 * time.Millisecond)
 
-		parts, err := store.listAllParts(ctx, id)
+		parts, err = store.listAllParts(ctx, id)
 	}
 
 	if len(parts) == 0 {
